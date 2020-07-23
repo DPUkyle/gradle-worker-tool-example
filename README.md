@@ -35,6 +35,7 @@ Guava v6 is on the buildscript classpath of `:consumer`; if it is seen by `MockC
 
 ## Scenario one: "Legacy" API, Gradle 5.2.1 runtime
 `$ git checkout branch-5.2.1`
+
 `$ ./gradlew :mock-codegen-plugin:assemble && ./gradlew :consumer:codegen --rerun-tasks`
 
 Everything is fine; see MockCodegenTool line 38.
@@ -42,6 +43,7 @@ The Worker Daemon contains the entire Gradle API, but does not contain other con
 
 ## Scenario two: "Legacy" API, Gradle 5.6.4 runtime
 `$ git checkout branch-5.6.4`
+
 `$ ./gradlew :mock-codegen-plugin:assemble && ./gradlew :consumer:codegen --rerun-tasks`
 
 Kaboom!
@@ -57,6 +59,7 @@ The presence of guava-r06 breaks code which was compiled against a higher API ve
 
 ## Scenario two: "New" API, Gradle 5.6.4 runtime
 `$ git checkout branch-5.6.4-new`
+
 `$ ./gradlew :mock-codegen-plugin:assemble && ./gradlew :consumer:codegen --rerun-tasks`
 
 Same failure as "legacy" API; buildscript classpath takes precedence.
