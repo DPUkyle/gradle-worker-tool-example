@@ -44,7 +44,15 @@ The Worker Daemon contains the entire Gradle API, but does not contain other con
 `$ git checkout branch-5.6.4`
 `$ ./gradlew :mock-codegen-plugin:assemble && ./gradlew :consumer:codegen --rerun-tasks`
 
-Kaboom.  The worker daemon's classpath contains `mock-codegen-tool.jar, mock-codegen-plugin.jar, guava-r06.jar]`
+Kaboom!
+
+```
+Execution failed for task ':consumer:codegen'.
+> A failure occurred while executing Mock Codegen Daemon
+   > java.lang.RuntimeException: Could not find Lists#reverse!!!
+```
+
+The worker daemon's classpath contains `mock-codegen-tool.jar, mock-codegen-plugin.jar, guava-r06.jar]`
 The presence of guava-r06 breaks code which was compiled against a higher API verison.
 
 ## Scenario two: "New" API, Gradle 5.6.4 runtime
