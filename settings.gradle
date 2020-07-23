@@ -1,0 +1,7 @@
+rootProject.name = 'gradle-worker-tool-example'
+
+include 'mock-codegen-tool'
+include 'mock-codegen-plugin'
+if (new File('mock-codegen-plugin/build/libs/mock-codegen-plugin.jar').exists()) {
+    include 'consumer'
+}

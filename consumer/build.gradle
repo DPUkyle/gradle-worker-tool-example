@@ -1,0 +1,22 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.google.guava:guava:r06' // FIXME presence of older dependency takes precedence on worker API classpath in 5.6+, breaking MockCodegenTool
+        classpath project.rootProject.files('mock-codegen-plugin/build/libs/mock-codegen-plugin.jar')
+    }
+}
+
+apply plugin: 'java'
+apply plugin: com.kylemoore.gradle.plugin.MockCodegenPlugin
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.google.guava:guava:r07'
+}
+
+//codegen.debugEnabled = true
