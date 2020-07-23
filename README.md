@@ -59,7 +59,7 @@ The presence of guava-r06 breaks code which was compiled against a higher API ve
 `$ git checkout branch-5.6.4-new`
 `$ ./gradlew :mock-codegen-plugin:assemble && ./gradlew :consumer:codegen --rerun-tasks`
 
-TBD
+Same failure as "legacy" API; buildscript classpath takes precedence.
 
 ## Debugging
 To debug the problem, uncomment `consumer/build.gradle` line 22.  You will then be prompted to connect to the worker 
