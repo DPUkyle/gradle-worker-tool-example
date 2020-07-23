@@ -1,26 +1,16 @@
 package com.kylemoore.gradle.tool;
 
 import com.kylemoore.tool.MockCodegenTool;
+import org.gradle.workers.WorkAction;
 
-import javax.inject.Inject;
-
-public class MockCodegenRunner implements Runnable {
-
-  private final String compileClasspath;
-  private final String analysisDir;
-  private final String outputFile;
-
-  @Inject
-  public MockCodegenRunner(String compileClasspath, String analysisDir, String outputFile) {
-    this.compileClasspath = compileClasspath;
-    this.analysisDir = analysisDir;
-    this.outputFile = outputFile;
-  }
+public abstract class MockCodegenRunner implements WorkAction<MockCodegenToolParameters> {
 
   @Override
-  public void run() {
+  public void execute() {
     try {
-      MockCodegenTool.main(new String[]{compileClasspath, analysisDir, outputFile});
+      MockCodegenTool.main(new String[]{getParameters().getCompileClasspath().getAsPath(),
+              getParameters().getAnalysisDir().getAsFile().get().getAbsolutePath(),
+              getParameters().getOutputFile().getAsFile().get().getAbsolutePath()});
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

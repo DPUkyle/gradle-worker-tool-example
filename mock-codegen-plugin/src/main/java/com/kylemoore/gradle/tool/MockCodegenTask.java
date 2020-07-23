@@ -6,7 +6,7 @@ import org.gradle.api.tasks.Classpath;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
-import org.gradle.workers.IsolationMode;
+import org.gradle.workers.WorkQueue;
 import org.gradle.workers.WorkerExecutor;
 
 import javax.inject.Inject;
@@ -74,16 +74,17 @@ public class MockCodegenTask extends DefaultTask {
 
   @TaskAction
   public void generate() {
-    workerExecutor.submit(MockCodegenRunner.class, config -> {
-      config.setIsolationMode(IsolationMode.PROCESS);
-      config.setClasspath(getToolClasspath());
-      config.forkOptions(javaForkOptions -> {
+    WorkQueue workQueue = workerExecutor.processIsolation(workerSpec -> {
+      workerSpec.getClasspath().from(getToolClasspath());
+      workerSpec.forkOptions(javaForkOptions -> {
         javaForkOptions.setDebug(isDebugEnabled());
       });
-      config.setDisplayName("Mock Codegen Daemon");
-      config.params(getCompileClasspath().getAsPath(), //compileClasspath
-              getClassesToAnalyze().getSingleFile().getAbsolutePath(), //analysisDir
-              getOutputFile().getAbsolutePath()); //outputFile
+    });
+
+    workQueue.submit(MockCodegenRunner.class, parameters -> {
+      parameters.getCompileClasspath().from(getCompileClasspath());
+      parameters.getAnalysisDir().set(getClassesToAnalyze().getSingleFile());
+      parameters.getOutputFile().set(getOutputFile());
     });
   }
 }
