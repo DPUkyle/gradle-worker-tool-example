@@ -39,7 +39,7 @@ public class MockCodegenTool {
     // 5.6.4 + legacy API: getURLs() -> [mock-codegen-tool.jar, mock-codegen-plugin.jar, guava-r06.jar]
     ClassLoader workerDaemonClassLoader = Thread.currentThread().getContextClassLoader();
 
-    URLClassLoader singleUseClassLoader = new URLClassLoader(urls.toArray(new URL[0]), workerDaemonClassLoader);
+    URLClassLoader singleUseClassLoader = new ChildFirstClassLoader(urls.toArray(new URL[0]), workerDaemonClassLoader);
 
     executeWithChildClassLoader(singleUseClassLoader, () -> {
       Class<?> lists = Class.forName("com.google.common.collect.Lists", false, Thread.currentThread().getContextClassLoader());
