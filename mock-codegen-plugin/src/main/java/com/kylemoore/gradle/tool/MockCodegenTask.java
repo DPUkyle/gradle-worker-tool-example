@@ -11,9 +11,6 @@ import org.gradle.workers.WorkerExecutor;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Arrays;
 
 public class MockCodegenTask extends DefaultTask {
 
@@ -77,32 +74,16 @@ public class MockCodegenTask extends DefaultTask {
 
   @TaskAction
   public void generate() {
-      ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-      try {
-          Thread.currentThread().setContextClassLoader(getMinimumClassLoader());
-          workerExecutor.submit(MockCodegenRunner.class, config -> {
-              config.setIsolationMode(IsolationMode.PROCESS);
-              config.setClasspath(getToolClasspath());
-              config.forkOptions(javaForkOptions -> {
-                  javaForkOptions.setDebug(isDebugEnabled());
-              });
-              config.setDisplayName("Mock Codegen Daemon");
-              config.params(getCompileClasspath().getAsPath(), //compileClasspath
-                  getClassesToAnalyze().getSingleFile().getAbsolutePath(), //analysisDir
-                  getOutputFile().getAbsolutePath()); //outputFile
-          });
-      } finally {
-          Thread.currentThread().setContextClassLoader(originalClassLoader);
-      }
-  }
-
-  private ClassLoader getMinimumClassLoader() {
-      URLClassLoader contextClassloader = (URLClassLoader) Thread.currentThread().getContextClassLoader();
-      URL[] urls = Arrays.stream(contextClassloader.getURLs()).filter(url -> isModule(url, "mock-codegen-plugin")).toArray(URL[]::new);
-      return new URLClassLoader(urls, contextClassloader.getParent());
-  }
-
-  private boolean isModule(URL url, String moduleName) {
-      return url.getFile() != null && new File(url.getFile()).getName().startsWith(moduleName);
+    workerExecutor.submit(MockCodegenRunner.class, config -> {
+      config.setIsolationMode(IsolationMode.PROCESS);
+      config.setClasspath(getToolClasspath());
+      config.forkOptions(javaForkOptions -> {
+        javaForkOptions.setDebug(isDebugEnabled());
+      });
+      config.setDisplayName("Mock Codegen Daemon");
+      config.params(getCompileClasspath().getAsPath(), //compileClasspath
+              getClassesToAnalyze().getSingleFile().getAbsolutePath(), //analysisDir
+              getOutputFile().getAbsolutePath()); //outputFile
+    });
   }
 }
