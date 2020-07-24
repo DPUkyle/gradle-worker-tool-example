@@ -47,6 +47,10 @@ public class MockCodegenTool {
       if (Arrays.stream(methods).noneMatch(m -> "reverse".equals(m.getName()))) {
         throw new RuntimeException("Could not find Lists#reverse!!!");
       }
+      URL listsLocation = lists.getProtectionDomain().getCodeSource().getLocation();
+      if (!listsLocation.getFile().endsWith("guava-r07.jar")) {
+        throw new RuntimeException("Wrong version of guava; expected guava-r07.jar, got " + listsLocation.toString());
+      }
       return null;
     });
 

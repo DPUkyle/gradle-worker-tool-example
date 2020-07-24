@@ -22,7 +22,8 @@ dependencies would be a performance advantage when compared to a simple `Project
 # The problem
 When invoked with "Legacy" Worker APIs (`WorkerExecutor#submit`) and Gradle 5.6.4, the classloader contains the 
 buildscript classpath of the invoking task's project.  ABI incompatibilities can result, as detailed below.  This 
-behavior was not observed in Gradle 5.2.1.
+behavior diverges from Gradle 5.2.1 - I need to know how to launch a persistent process for a "tool" which
+receives a classpath as a tool argument, classloads the list and disposes upon completion.
 
 # Steps to reproduce
 Please try the following three scenarios.
@@ -38,8 +39,9 @@ Guava v6 is on the buildscript classpath of `:consumer`; if it is seen by `MockC
 
 `$ ./gradlew :mock-codegen-plugin:assemble && ./gradlew :consumer:codegen --rerun-tasks`
 
-Everything is fine; see MockCodegenTool line 38.
-The Worker Daemon contains the entire Gradle API, but does not contain other conflicting dependencies.
+Fails.  The Worker Daemon contains the entire Gradle API, but does not contain other conflicting dependencies.
+
+The wrong version of guava is loaded: `gradle-5.2.1/lib/guava-26.0-android.jar`
 
 ## Scenario two: "Legacy" API, Gradle 5.6.4 runtime
 `$ git checkout branch-5.6.4`
@@ -54,8 +56,8 @@ Execution failed for task ':consumer:codegen'.
    > java.lang.RuntimeException: Could not find Lists#reverse!!!
 ```
 
-The worker daemon's classpath contains `mock-codegen-tool.jar, mock-codegen-plugin.jar, guava-r06.jar]`
-The presence of guava-r06 breaks code which was compiled against a higher API verison.
+The worker daemon's classpath contains `[mock-codegen-tool.jar, mock-codegen-plugin.jar, guava-r06.jar]`
+The presence of guava-r06 will break code (`c.k.d.Dummy`) which was compiled against a higher API verison.
 
 ## Scenario two: "New" API, Gradle 5.6.4 runtime
 `$ git checkout branch-5.6.4-new`
